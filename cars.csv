@@ -6,6 +6,9 @@ Perodua,Alza,1.5L,Petrol,7,MPV
 Perodua,Aruz,1.5L,Petrol,7,SUV
 Perodua,Kancil,0.8L,Petrol,4,Hatchback
 Perodua,Viva,1.0L,Petrol,5,Hatchback
+Perodua,Ativa,1.0L,Petrol,5,SUV
+Perodua,Kenari,1.0L,Petrol,5,Hatchback
+Perodua,Rusa,1.3L,Petrol,8,MPV
 
 Proton,Saga,1.3L,Petrol,5,Sedan
 Proton,Persona,1.6L,Petrol,5,Sedan
@@ -15,6 +18,8 @@ Proton,X50,1.5L,Petrol,5,SUV
 Proton,X70,1.8L,Petrol,5,SUV
 Proton,Preve,1.6L,Petrol,5,Sedan
 Proton,Satria,1.6L,Petrol,5,Hatchback
+Proton,Putra,1.8L,Petrol,5,Coupe
+Proton,Inspira,2.0L,Petrol,5,Sedan
 
 Toyota,Vios,1.5L,Petrol,5,Sedan
 Toyota,Corolla Altis,1.8L,Petrol,5,Sedan
@@ -26,6 +31,11 @@ Toyota,Alphard,2.5L,Petrol,7,MPV
 Toyota,Vellfire,2.5L,Petrol,7,MPV
 Toyota,Rush,1.5L,Petrol,7,SUV
 Toyota,Avanza,1.5L,Petrol,7,MPV
+Toyota,Innova,2.0L,Petrol,7,MPV
+Toyota,Harrier,2.0L,Petrol,5,SUV
+Toyota,Prius,1.8L,Hybrid,5,Hatchback
+Toyota,Land Cruiser,4.5L,Diesel,7,SUV
+Toyota,Hiace,2.8L,Diesel,12,Van
 
 Honda,City,1.5L,Petrol,5,Sedan
 Honda,Civic,1.5L,Petrol,5,Sedan
@@ -34,15 +44,69 @@ Honda,HR-V,1.8L,Petrol,5,SUV
 Honda,CR-V,2.0L,Petrol,7,SUV
 Honda,BR-V,1.5L,Petrol,7,MPV
 Honda,Jazz,1.5L,Petrol,5,Hatchback
+Honda,Odyssey,2.4L,Petrol,7,MPV
+Honda,Stream,1.8L,Petrol,7,MPV
+Honda,Insight,1.5L,Hybrid,5,Sedan
 
 Nissan,Almera,1.0L,Petrol,5,Sedan
 Nissan,X-Trail,2.0L,Petrol,7,SUV
 Nissan,Serena,2.0L,Petrol,7,MPV
 Nissan,Navara,2.5L,Diesel,5,Pickup
+Nissan,Teana,2.0L,Petrol,5,Sedan
+Nissan,March,1.2L,Petrol,5,Hatchback
+Nissan,Latio,1.6L,Petrol,5,Sedan
+Nissan,GT-R,3.8L,Petrol,4,Sports
+Nissan,Elgrand,2.5L,Petrol,7,MPV
+Nissan,Juke,1.6L,Petrol,5,SUV
 
-Mazda,3,2.0L,Petrol,5,Sedan
-Mazda,CX-5,2.5L,Petrol,5,SUV
 Mazda,2,1.5L,Petrol,5,Hatchback
+Mazda,3,2.0L,Petrol,5,Sedan
+Mazda,6,2.5L,Petrol,5,Sedan
+Mazda,CX-3,2.0L,Petrol,5,SUV
+Mazda,CX-5,2.5L,Petrol,5,SUV
+Mazda,CX-8,2.2L,Diesel,7,SUV
+Mazda,MX-5,2.0L,Petrol,2,Sports
+Mazda,Tribute,2.3L,Petrol,5,SUV
+Mazda,BT-50,3.0L,Diesel,5,Pickup
+Mazda,Premacy,2.0L,Petrol,7,MPV
 
 Mitsubishi,Xpander,1.5L,Petrol,7,MPV
 Mitsubishi,Triton,2.4L,Diesel,5,Pickup
+Mitsubishi,Outlander,2.0L,Petrol,7,SUV
+Mitsubishi,Pajero Sport,2.4L,Diesel,7,SUV
+Mitsubishi,Lancer,2.0L,Petrol,5,Sedan
+Mitsubishi,Attrage,1.2L,Petrol,5,Sedan
+Mitsubishi,Mirage,1.2L,Petrol,5,Hatchback
+Mitsubishi,ASX,2.0L,Petrol,5,SUV
+Mitsubishi,Grandis,2.4L,Petrol,7,MPV
+Mitsubishi,Eclipse Cross,1.5L,Petrol,5,SUV
+
+BMW,320i,2.0L,Petrol,5,Sedan
+BMW,330e,2.0L,Hybrid,5,Sedan
+BMW,X1,1.5L,Petrol,5,SUV
+BMW,X3,2.0L,Petrol,5,SUV
+BMW,X5,3.0L,Petrol,7,SUV
+
+Mercedes-Benz,C200,1.5L,Petrol,5,Sedan
+Mercedes-Benz,E200,2.0L,Petrol,5,Sedan
+Mercedes-Benz,S400,3.0L,Hybrid,5,Sedan
+Mercedes-Benz,GLA200,1.3L,Petrol,5,SUV
+Mercedes-Benz,GLC300,2.0L,Petrol,5,SUV
+
+Hyundai,Elantra,1.6L,Petrol,5,Sedan
+Hyundai,Sonata,2.0L,Petrol,5,Sedan
+Hyundai,Tucson,2.0L,Petrol,5,SUV
+Hyundai,Santa Fe,2.2L,Diesel,7,SUV
+Hyundai,Starex,2.5L,Diesel,11,Van
+
+Kia,Cerato,1.6L,Petrol,5,Sedan
+Kia,Optima,2.0L,Petrol,5,Sedan
+Kia,Sportage,2.0L,Petrol,5,SUV
+Kia,Sorento,2.2L,Diesel,7,SUV
+Kia,Carnival,2.2L,Diesel,11,MPV
+
+Volkswagen,Polo,1.6L,Petrol,5,Hatchback
+Volkswagen,Golf,1.4L,Petrol,5,Hatchback
+Volkswagen,Passat,2.0L,Petrol,5,Sedan
+Volkswagen,Tiguan,2.0L,Petrol,5,SUV
+Volkswagen,Multivan,2.0L,Diesel,7,MPV
