@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import time
+from datetime import datetime
 
 # -------------------------
 # LOAD DATA
@@ -17,25 +18,52 @@ maintenance.columns = maintenance.columns.str.strip().str.lower()
 # -------------------------
 
 st.set_page_config(
-    page_title="Artificial Intelligence Based Car Advisory Chatbot for Malaysian Car Owners",
-    page_icon="🚗"
+    page_title="AI Based Car Advisory Chatbot",
+    page_icon="🚗",
+    layout="wide"
 )
 
-st.title("🚗 Artificial Intelligence Based Car Advisory Chatbot for Malaysian Car Owners")
-st.write("Ask me about car models, seat recommendations, driving usage, or maintenance!")
+st.title("🚗 Artificial Intelligence Based Car Advisory Chatbot")
+st.write("Ask me about car models, seat recommendations, driving usage, maintenance, or car comparison!")
 
 # -------------------------
-# MEMORY
+# SESSION STATE INITIALIZATION
 # -------------------------
 
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []
+if "conversations" not in st.session_state:
+    st.session_state.conversations = {}
+
+if "current_chat" not in st.session_state:
+    chat_id = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    st.session_state.current_chat = chat_id
+    st.session_state.conversations[chat_id] = []
+
+# -------------------------
+# SIDEBAR – CHAT HISTORY
+# -------------------------
+
+st.sidebar.header("💬 Chat History")
+
+for chat_id in st.session_state.conversations:
+    if st.sidebar.button(chat_id):
+        st.session_state.current_chat = chat_id
+
+st.sidebar.divider()
+
+if st.sidebar.button("🗑 Clear Current Chat"):
+    st.session_state.conversations[st.session_state.current_chat] = []
+    st.sidebar.success("Current chat cleared!")
+
+if st.sidebar.button("➕ New Chat"):
+    new_id = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    st.session_state.current_chat = new_id
+    st.session_state.conversations[new_id] = []
 
 # -------------------------
 # TYPING EFFECT
 # -------------------------
 
-def type_writer(text, speed=0.02):
+def type_writer(text, speed=0.01):
     placeholder = st.empty()
     typed = ""
     for char in text:
@@ -44,128 +72,115 @@ def type_writer(text, speed=0.02):
         time.sleep(speed)
 
 # -------------------------
-# INTENT FUNCTIONS
+# CHATBOT LOGIC
 # -------------------------
 
 def greeting_reply(text):
     if any(word in text.lower() for word in ["hi", "hello", "hey"]):
         return (
             "👋 Hi! I provide car advice based on real datasets.\n\n"
-            "You can ask:\n"
-            "• *I drive mostly in city*\n"
-            "• *Suggest me a 7 seater car*\n"
-            "• *Tell me about Toyota Vios*\n"
-            "• *How often should I service Perodua Myvi?*"
+            "Try asking:\n"
+            "• I drive mostly in city\n"
+            "• Suggest me a 7 seater car\n"
+            "• Compare Toyota Vios and Perodua Myvi\n"
+            "• How often should I service Toyota Vios?"
         )
     return None
 
 
-# -------------------------
-# DRIVING USAGE (CSV-BASED)
-# -------------------------
+def car_comparison(text):
+    if "compare" not in text.lower():
+        return None
+
+    found_cars = []
+
+    for _, row in cars.iterrows():
+        full_name = f"{row['brand']} {row['model']}".lower()
+        if full_name in text.lower():
+            found_cars.append(row)
+
+    if len(found_cars) < 2:
+        return "❌ Please specify **two car models** for comparison.\nExample: *Compare Toyota Vios and Perodua Myvi*"
+
+    car1, car2 = found_cars[:2]
+
+    return f"""
+📊 **Car Comparison Result**
+
+| Feature | {car1['brand']} {car1['model']} | {car2['brand']} {car2['model']} |
+|--------|----------------|----------------|
+| Engine | {car1['engine']} | {car2['engine']} |
+| Fuel | {car1['fuel']} | {car2['fuel']} |
+| Seats | {car1['seats']} | {car2['seats']} |
+| Type | {car1['type']} | {car2['type']} |
+"""
+
 
 def driving_usage_recommendation(text):
-    text = text.lower()
-
     usage_map = {
         "city": "hatchback",
-        "urban": "hatchback",
         "family": "mpv",
-        "kids": "mpv",
-        "highway": "sedan",
-        "long distance": "sedan",
-        "outstation": "sedan"
+        "highway": "sedan"
     }
 
     for keyword, car_type in usage_map.items():
-        if keyword in text:
-            results = cars[cars["type"].str.lower() == car_type]
-
+        if keyword in text.lower():
+            results = cars[cars["type"] == car_type]
             if results.empty:
-                return "❌ No suitable cars found in the dataset."
+                return "❌ No suitable cars found."
 
-            reply = f"🚗 **Recommended {car_type.title()} Cars for {keyword.title()} Driving:**\n\n"
+            reply = f"🚗 **Recommended {car_type.title()} Cars:**\n\n"
             for _, row in results.iterrows():
-                reply += f"• {row['brand']} {row['model']} ({row['engine']})\n"
-
+                reply += f"• {row['brand']} {row['model']}\n"
             return reply
-
     return None
 
-
-# -------------------------
-# SEAT RECOMMENDATION
-# -------------------------
 
 def seat_recommendation(text):
-    text = text.lower()
     for seat in ["5", "7"]:
-        if f"{seat} seater" in text:
+        if f"{seat} seater" in text.lower():
             results = cars[cars["seats"] == int(seat)]
-
-            if results.empty:
-                return "❌ No cars found with that seating capacity."
-
-            reply = f"🚗 **{seat}-Seater Cars from Dataset:**\n\n"
+            reply = f"🚗 **{seat}-Seater Cars:**\n\n"
             for _, row in results.iterrows():
-                reply += f"• {row['brand']} {row['model']} ({row['type']})\n"
+                reply += f"• {row['brand']} {row['model']}\n"
             return reply
-
     return None
 
 
-# -------------------------
-# MAINTENANCE (CSV-BASED)
-# -------------------------
-
 def maintenance_advice(text):
-    text = text.lower()
-
-    if "service" not in text and "maintenance" not in text:
-        return None
-
     for _, row in maintenance.iterrows():
         full_name = f"{row['brand']} {row['model']}".lower()
-        if full_name in text:
+        if full_name in text.lower():
             return f"""
-🛠 **Maintenance Schedule – {row['brand']} {row['model']}**
+🛠 **Maintenance – {row['brand']} {row['model']}**
 
-• Engine oil: every **{row['engine_oil_km']:,} km**
-• Major service: every **{row['major_service_km']:,} km**
-• Battery lifespan: **{row['battery_years']} years**
-• Tyre rotation: every **{row['tyre_rotation_km']:,} km**
+• Engine oil: {row['engine_oil_km']} km  
+• Major service: {row['major_service_km']} km  
+• Battery lifespan: {row['battery_years']} years  
+• Tyre rotation: {row['tyre_rotation_km']} km
 """
+    return None
 
-    return "🛠 Please specify a car model found in the dataset."
-
-
-# -------------------------
-# CAR INFORMATION (CSV-BASED)
-# -------------------------
 
 def car_info(text):
-    text = text.lower()
     for _, row in cars.iterrows():
         full_name = f"{row['brand']} {row['model']}".lower()
-        if full_name in text:
+        if full_name in text.lower():
             return f"""
 🚘 **{row['brand']} {row['model']}**
 
-• Engine: {row['engine']}
-• Fuel: {row['fuel']}
-• Seats: {row['seats']}
+• Engine: {row['engine']}  
+• Fuel: {row['fuel']}  
+• Seats: {row['seats']}  
 • Type: {row['type']}
 """
     return None
 
 
-# -------------------------
-# CHATBOT BRAIN
-# -------------------------
-
 def chatbot_reply(text):
     for func in [
         greeting_reply,
+        car_comparison,
         driving_usage_recommendation,
         seat_recommendation,
         maintenance_advice,
@@ -175,26 +190,27 @@ def chatbot_reply(text):
         if reply:
             return reply
 
-    return (
-        "🤔 I couldn’t find that in my dataset.\n\n"
-        "Try asking:\n"
-        "• *I drive mostly in city*\n"
-        "• *Suggest me a 7 seater car*\n"
-        "• *How often should I service Toyota Vios?*"
-    )
+    return "🤔 I couldn't find that in my dataset. Try rephrasing."
 
 # -------------------------
-# UI
+# CHAT UI
 # -------------------------
 
 user_input = st.text_input("You:", placeholder="Ask something...")
 
 if st.button("Send") and user_input:
-    st.session_state.chat_history.append(("You", user_input))
-    st.session_state.chat_history.append(("Bot", chatbot_reply(user_input)))
+    st.session_state.conversations[st.session_state.current_chat].append(("You", user_input))
+    st.session_state.conversations[st.session_state.current_chat].append(
+        ("Bot", chatbot_reply(user_input))
+    )
 
-for sender, message in st.session_state.chat_history:
+# -------------------------
+# DISPLAY CHAT
+# -------------------------
+
+for sender, message in st.session_state.conversations[st.session_state.current_chat]:
     if sender == "Bot":
         type_writer(message)
     else:
         st.write(f"**{sender}:** {message}")
+
