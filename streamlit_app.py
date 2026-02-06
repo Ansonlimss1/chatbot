@@ -27,7 +27,7 @@ st.title("🚗 Artificial Intelligence Based Car Advisory Chatbot")
 st.write("Ask me about car models, seat recommendations, driving usage, maintenance, or car comparison!")
 
 # -------------------------
-# SESSION STATE INITIALIZATION
+# SESSION STATE
 # -------------------------
 
 if "conversations" not in st.session_state:
@@ -72,19 +72,82 @@ def type_writer(text, speed=0.01):
         time.sleep(speed)
 
 # -------------------------
-# CHATBOT LOGIC
+# CHATBOT FUNCTIONS
 # -------------------------
 
 def greeting_reply(text):
     if any(word in text.lower() for word in ["hi", "hello", "hey"]):
         return (
-            "👋 Hi! I provide car advice based on real datasets.\n\n"
+            "👋 Hi! I provide car advice based on structured automotive datasets.\n\n"
             "Try asking:\n"
             "• I drive mostly in city\n"
             "• Suggest me a 7 seater car\n"
             "• Compare Toyota Vios and Perodua Myvi\n"
+            "• Why Toyota Vios?\n"
             "• How often should I service Toyota Vios?"
         )
+    return None
+
+
+# ✅ IMPROVED EXPLAINABLE REASONING MODULE
+def why_this_car(text):
+    if "why" not in text.lower():
+        return None
+
+    for _, row in cars.iterrows():
+        full_name = f"{row['brand']} {row['model']}".lower()
+        if full_name in text.lower():
+
+            explanation = []
+
+            # Seating logic
+            if row["seats"] >= 7:
+                explanation.append(
+                    "The vehicle offers a higher seating capacity, making it suitable for families or group travel."
+                )
+            else:
+                explanation.append(
+                    "The vehicle provides standard seating capacity, suitable for daily commuting or small families."
+                )
+
+            # Vehicle type logic
+            if row["type"] in ["hatchback", "sedan"]:
+                explanation.append(
+                    "Its body type is optimized for urban environments, providing better fuel efficiency and easier handling."
+                )
+
+            if row["type"] in ["suv", "mpv"]:
+                explanation.append(
+                    "Its body type provides enhanced space and comfort, suitable for long-distance and family usage."
+                )
+
+            # Fuel logic
+            if row["fuel"] == "petrol":
+                explanation.append(
+                    "Petrol engines generally offer smoother driving experience and lower maintenance cost."
+                )
+            elif row["fuel"] == "diesel":
+                explanation.append(
+                    "Diesel engines provide higher torque and better efficiency for long-distance driving."
+                )
+
+            explanation_text = "\n".join([f"• {e}" for e in explanation])
+
+            return f"""
+🧠 **Why {row['brand']} {row['model']}?**
+
+This recommendation is generated using **rule-based reasoning** by analysing the vehicle specifications against common driving needs.
+
+**Vehicle Profile:**
+• Seats: {row['seats']}  
+• Vehicle Type: {row['type'].title()}  
+• Fuel Type: {row['fuel'].title()}
+
+**Reasoning Explanation:**
+{explanation_text}
+
+📌 *This explanation is produced using structured automotive data and predefined decision rules to ensure transparency and consistency.*
+"""
     return None
 
 
@@ -100,7 +163,7 @@ def car_comparison(text):
             found_cars.append(row)
 
     if len(found_cars) < 2:
-        return "❌ Please specify **two car models** for comparison.\nExample: *Compare Toyota Vios and Perodua Myvi*"
+        return "❌ Please specify **two car models** for comparison."
 
     car1, car2 = found_cars[:2]
 
@@ -180,6 +243,7 @@ def car_info(text):
 def chatbot_reply(text):
     for func in [
         greeting_reply,
+        why_this_car,
         car_comparison,
         driving_usage_recommendation,
         seat_recommendation,
