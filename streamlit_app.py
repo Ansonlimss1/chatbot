@@ -257,24 +257,34 @@ def chatbot_reply(text):
     return "🤔 I couldn't find that in my dataset. Try rephrasing."
 
 # -------------------------
-# CHAT UI
+# CHAT INPUT
 # -------------------------
 
 user_input = st.text_input("You:", placeholder="Ask something...")
 
 if st.button("Send") and user_input:
-    st.session_state.conversations[st.session_state.current_chat].append(("You", user_input))
     st.session_state.conversations[st.session_state.current_chat].append(
-        ("Bot", chatbot_reply(user_input))
+        {"sender": "You", "text": user_input, "animate": False}
+    )
+
+    reply = chatbot_reply(user_input)
+
+    st.session_state.conversations[st.session_state.current_chat].append(
+        {"sender": "Bot", "text": reply, "animate": True}
     )
 
 # -------------------------
-# DISPLAY CHAT
+# DISPLAY CHAT (FIXED)
 # -------------------------
 
-for sender, message in st.session_state.conversations[st.session_state.current_chat]:
-    if sender == "Bot":
-        type_writer(message)
+for msg in st.session_state.conversations[st.session_state.current_chat]:
+    if msg["sender"] == "Bot":
+        if msg["animate"]:
+            type_writer(msg["text"])
+            msg["animate"] = False  # 🔑 prevent replay
+        else:
+            st.write(f"**Bot:** {msg['text']}")
     else:
-        st.write(f"**{sender}:** {message}")
+        st.write(f"**You:** {msg['text']}")
+
 
