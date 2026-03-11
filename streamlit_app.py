@@ -38,6 +38,10 @@ if "current_chat" not in st.session_state:
     st.session_state.current_chat = chat_id
     st.session_state.conversations[chat_id] = []
 
+# 🔒 Rate limiting session state
+if "last_message_time" not in st.session_state:
+    st.session_state.last_message_time = 0
+
 # -------------------------
 # SIDEBAR – CHAT HISTORY
 # -------------------------
@@ -89,7 +93,6 @@ def greeting_reply(text):
     return None
 
 
-# ✅ IMPROVED EXPLAINABLE REASONING MODULE
 def why_this_car(text):
     if "why" not in text.lower():
         return None
@@ -100,7 +103,6 @@ def why_this_car(text):
 
             explanation = []
 
-            # Seating logic
             if row["seats"] >= 7:
                 explanation.append(
                     "The vehicle offers a higher seating capacity, making it suitable for families or group travel."
@@ -110,7 +112,6 @@ def why_this_car(text):
                     "The vehicle provides standard seating capacity, suitable for daily commuting or small families."
                 )
 
-            # Vehicle type logic
             if row["type"] in ["hatchback", "sedan"]:
                 explanation.append(
                     "Its body type is optimized for urban environments, providing better fuel efficiency and easier handling."
@@ -121,7 +122,6 @@ def why_this_car(text):
                     "Its body type provides enhanced space and comfort, suitable for long-distance and family usage."
                 )
 
-            # Fuel logic
             if row["fuel"] == "petrol":
                 explanation.append(
                     "Petrol engines generally offer smoother driving experience and lower maintenance cost."
@@ -256,13 +256,24 @@ def chatbot_reply(text):
 
     return "🤔 I couldn't find that in my dataset. Try rephrasing."
 
+
 # -------------------------
-# CHAT INPUT
+# CHAT INPUT (WITH RATE LIMITING)
 # -------------------------
 
 user_input = st.text_input("You:", placeholder="Ask something...")
 
 if st.button("Send") and user_input:
+
+    current_time = time.time()
+
+    # 🔒 Rate limiting: 2 second delay
+    if current_time - st.session_state.last_message_time < 2:
+        st.warning("⚠️ Please wait 2 seconds before sending another message.")
+        st.stop()
+
+    st.session_state.last_message_time = current_time
+
     st.session_state.conversations[st.session_state.current_chat].append(
         {"sender": "You", "text": user_input, "animate": False}
     )
@@ -274,17 +285,15 @@ if st.button("Send") and user_input:
     )
 
 # -------------------------
-# DISPLAY CHAT (FIXED)
+# DISPLAY CHAT
 # -------------------------
 
 for msg in st.session_state.conversations[st.session_state.current_chat]:
     if msg["sender"] == "Bot":
         if msg["animate"]:
             type_writer(msg["text"])
-            msg["animate"] = False  # 🔑 prevent replay
+            msg["animate"] = False
         else:
             st.write(f"**Bot:** {msg['text']}")
     else:
         st.write(f"**You:** {msg['text']}")
-
-
